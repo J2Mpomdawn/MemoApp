@@ -1,0 +1,47 @@
+[Providerにアクセスしたい]
+    ↓
+[どこから？]
+  |
+  |--{テスト/Dartのみのコードから}
+  |    ↓
+  | (ProviderContainer.read)
+  |
+  |--{他のProviderから}
+  |    ↓
+  | [値は変更される？]
+  |   |
+  |   |--{YES}
+  |   |    ↓
+  |   | (ProviderReference.watch)
+  |   |
+  |   ---{NO}
+  |        ↓
+  |     (ProviderReference.read)
+  |
+  ---{Widgetから}
+       ↓
+    [ダイアログを出すため？]
+      |
+      |--{YES}
+      |    ↓
+      | (ProviderListener)
+      |
+      ---{NO}
+           ↓
+        [buildメソッドの中？]
+          |
+          |--{NO}
+          |    ↓
+          | (context.read)
+          |
+          ---{YES}
+               ↓
+            [flutter_fooksを使ってる？]
+              |
+              |--{YES}
+              |    ↓
+              | (useProvider)
+              |
+              ---{NO}
+                   ↓
+                (Consumer)
