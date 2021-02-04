@@ -17,28 +17,37 @@ class DirfSN extends StateNotifier<List<Df>> {
 }
 
 int number = 0;
-int select = 0;
+bool dof = true;
+int select = -1;
 
 class Df extends HookWidget {
   final n = number;
-  final colorSP = StateProvider<Color>((_) => Colors.cyan);
+  final colorSP = StateProvider<Color>((_) => null);
+  final icon = dof
+      ? Icon(Icons.folder, color: Colors.yellowAccent)
+      : Icon(Icons.description_outlined, color: Colors.white);
   final enableSP = StateProvider((_) => false);
+  final _ = new FocusNode();
   Widget build(BuildContext context) {
-    final _ = useFocusNode();
+    bool b = false;
     _.addListener(() {
       if (_.hasFocus) {
-        print('true');
-        //context.read(enableSP).state = false;
+        b = true;
       } else {
-        print('false');
+        if (b) {
+          context.read(enableSP).state = false;
+          b = false;
+        }
       }
     });
     final cp = useProvider(colorSP).state;
     final ep = useProvider(enableSP).state;
     return InkWell(
       onTap: () {
-        print('$n');
-        //
+        if (select != -1) {
+          context.read(context.read(dirfSNP.state)[select].colorSP).state =
+              null;
+        }
         select = n;
         context.read(colorSP).state = Colors.indigoAccent;
       },
@@ -49,8 +58,7 @@ class Df extends HookWidget {
           child: Row(children: [
             Container(
               margin: EdgeInsets.only(right: 4),
-              child: Icon(Icons.folder, color: Colors.yellowAccent),
-              color: Colors.deepPurpleAccent,
+              child: icon,
             ),
             ConstrainedBox(
               constraints: BoxConstraints(minWidth: 48),
@@ -121,12 +129,9 @@ class Dirf extends HookWidget {
 }
 
 class Memo extends HookWidget {
-  //
   @override
   Widget build(BuildContext context) {
-    /*final */ width = MediaQuery.of(context).size.width / /*3*/ 3.5;
-
-    //final dirf = useProvider(dirfSNP.state);
+    width = MediaQuery.of(context).size.width / /*3*/ 3.5;
 
     return Scaffold(
       /*
@@ -138,10 +143,14 @@ class Memo extends HookWidget {
           final FocusScopeNode currentScope = FocusScope.of(context);
           if (!currentScope.hasPrimaryFocus && currentScope.hasFocus) {
             FocusManager.instance.primaryFocus.unfocus();
+            return;
           }
-          //
+          if (select != -1) {
+            context.read(context.read(dirfSNP.state)[select].colorSP).state =
+                null;
+            select = -1;
+          }
         },
-        //
         child: Column(children: [
           Expanded(
             flex: context.read(flexSP).state,
@@ -161,7 +170,7 @@ class Memo extends HookWidget {
                   ),
                   RaisedButton(
                     onPressed: () {
-                      context.read(dirfSNP).add();
+                      //
                     },
                     child: Icon(Icons.airline_seat_flat),
                   ),
@@ -172,11 +181,16 @@ class Memo extends HookWidget {
           Expanded(
             flex: 30,
             child: Container(
-                color: Colors.blue,
+                color: Color(0xffe0e0e0),
                 child: Row(children: [
                   Expanded(
                       flex: 1,
                       child: Container(
+                        decoration: BoxDecoration(
+                          border: Border(
+                            right: BorderSide(width: 3),
+                          ),
+                        ),
                         height: double.infinity,
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -206,21 +220,27 @@ class Memo extends HookWidget {
                 child: Row(children: [
                   RaisedButton(
                     onPressed: () {
-                      //context.read(teP).state++;
+                      dof = true;
+                      context.read(dirfSNP).add();
                     },
                     child: Icon(Icons.folder),
                   ),
                   RaisedButton(
                     onPressed: () {
-                      //
+                      dof = false;
+                      context.read(dirfSNP).add();
                     },
                     child: Icon(Icons.description_outlined),
                   ),
                   RaisedButton(
                     onPressed: () {
-                      context
-                          .read(context.read(dirfSNP.state)[select].enableSP)
-                          .state = true;
+                      if (select != -1) {
+                        final sdf = context.read(dirfSNP.state)[select];
+                        context.read(sdf.enableSP).state = true;
+                        //rebuildを待つ処理が必要
+                        //待っても意味ないっぽい
+                        FocusScope.of(context).requestFocus(sdf._);
+                      }
                     },
                     child: Icon(Icons.border_color),
                   ),
